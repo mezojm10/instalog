@@ -2,16 +2,33 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Event {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  actorId    String
+  actorName  String
+  group      String
+  targetId   String
+  targetName String
+  location   String
+  metadata   Json?
+  action     Action   @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  actionId   String
+
+  @@index([actionId])
+}
+
+model Action {
+  id    String  @id @default(cuid())
+  name  String
+  Event Event[]
 }
