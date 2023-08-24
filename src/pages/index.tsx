@@ -11,7 +11,6 @@ function formatDate(date: Date) {
 }
 
 function Event({ event }: { event: IEvent }) {
-  console.log(event);
   return (
     <div className="collapse collapse-arrow">
       <input type="radio" name="my-accordion-2" />
@@ -72,6 +71,28 @@ function Event({ event }: { event: IEvent }) {
               </div>
             </div>
           </div>
+          <div className="w-2/3 flex flex-row justify-between">
+            <div className="flex flex-col w-1/3 mt-4">
+              <p className="text-neutral-400 text-sm font-medium uppercase">Target</p>
+              <div className="flex flex-row justify-between mt-4">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Name</p>
+                <p className="text-black text-sm font-normal">{event.targetName}</p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <p className="text-neutral-400 text-sm font-medium uppercase">ID</p>
+                <p className="text-black text-sm font-normal">{event.targetId}</p>
+              </div>
+            </div>
+            <div className="flex flex-col w-1/3 ml-4 mt-4">
+              <p className="text-neutral-400 text-sm font-medium uppercase">Metadata</p>
+              {Object.keys(event.metadata ?? {}).map((key, idx) => (
+                <div key={idx} className="flex flex-row justify-between mt-4">
+                  <p className="text-neutral-400 text-sm font-medium uppercase">{key}</p>
+                  <p className="text-black text-sm font-normal">{event.metadata && JSON.stringify((event.metadata as Record<string, unknown>)[key])}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div >
@@ -81,7 +102,7 @@ function Event({ event }: { event: IEvent }) {
 export default function Home() {
   const [isLive, setIsLive] = useState(false);
   const { data = [], isError, isLoading } = useEvents({ isLive });
-  if (isLoading) return <div className="w-50 h-px origin-center rotate-90 border border-neutral-200"></div>;
+  if (isLoading) return <span className="loading loading-spinner loading-lg"></span>;
   if (isError) return <div>Something went wrong</div>
   return (
     <>
@@ -91,7 +112,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-white">
-        <div className="w-9/12 h-96 bg-white rounded-2xl shadow border border-zinc-100">
+        <div className="w-9/12 h-3/4 bg-white rounded-2xl shadow border border-zinc-100">
           <div className="flex flex-col w-full h-20 top-left bg-neutral-100">
             <div className="flex flex-row h-11 rounded-lg border border-neutral-200 divide-x divide-solid divide-neutral-200">
               <input className="input input-ghost w-3/4" type="text" placeholder="Search name, email or action..." />
@@ -103,7 +124,7 @@ export default function Home() {
                 <Image src="/export.svg" alt="" width={15} height={8.5} />
                 <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Export</div>
               </div>
-              <div className="flex flex-row mr-auto cursor-pointer" onClick={() => setIsLive(!isLive)}>
+              <div className={"flex flex-row mr-auto cursor-pointer" + (isLive ? " bg-green-500" : "")} onClick={() => setIsLive(!isLive)}>
                 <Image src="/live.svg" alt="" width={15} height={8.5} />
                 <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Live</div>
               </div>
