@@ -21,7 +21,7 @@ export const eventInputSchema = z.object({
 });
 
 export const eventQuerySchema = z.object({
-  startAt: z.string().optional(),
+  startAfter: z.string().optional(),
   actorId: z.string().optional(),
   actorEmail: z.string().email().optional(),
   targetId: z.string().optional(),

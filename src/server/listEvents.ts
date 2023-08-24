@@ -80,7 +80,10 @@ export async function queryEvents(req: NextApiRequest, res: NextApiResponse) {
   };
 
   // Pagination
-  if (reqQuery.data.startAt) query.cursor = { id: reqQuery.data.startAt };
+  if (reqQuery.data.startAfter) {
+    query.cursor = { id: reqQuery.data.startAfter };
+    query.skip = 1;
+  }
 
   const events = await prisma.event.findMany(query);
   res.status(200).json({

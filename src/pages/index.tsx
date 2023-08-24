@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useEvents } from "~/useEvents";
 
 import type { Event as IEvent } from "~/server/zod";
+import { exportToCSV } from "~/exportCsv";
 
 function formatDate(date: Date) {
   return `${date.toLocaleDateString("en-Gb", { month: "short" })} ${date.getDate()}, ${date.toLocaleTimeString([], { timeStyle: "short" })}`;
@@ -101,8 +102,9 @@ function Event({ event }: { event: IEvent }) {
 
 export default function Home() {
   const [isLive, setIsLive] = useState(false);
-  const { data = [], isError, isLoading } = useEvents({ isLive });
-  if (isLoading) return <span className="loading loading-spinner loading-lg"></span>;
+  const [searchQuery, setQuery] = useState("");
+  const { data = [], isError, isLoading, size, setSize, mutate } = useEvents({ isLive, searchQuery });
+  if (isLoading) return <span className="loading loading-spinner loading-lg" />;
   if (isError) return <div>Something went wrong</div>
   return (
     <>
@@ -114,13 +116,18 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-center bg-white">
         <div className="w-9/12 h-3/4 bg-white rounded-2xl shadow border border-zinc-100">
           <div className="flex flex-col w-full h-20 top-left bg-neutral-100">
+
             <div className="flex flex-row h-11 rounded-lg border border-neutral-200 divide-x divide-solid divide-neutral-200">
-              <input className="input input-ghost w-3/4" type="text" placeholder="Search name, email or action..." />
+              <input className="input input-ghost w-3/4" type="text" placeholder="Search name, email or action..." onKeyDown={(e) => {
+                if (e.key !== "Enter") return;
+                mutate().catch(() => console.log("Something went wrong"));
+                setQuery(e.currentTarget.value);
+              }} />
               <div className="flex flex-row mr-auto cursor-pointer">
                 <Image src="/filter.svg" alt="" width={15} height={8.5} />
                 <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Filter</div>
               </div>
-              <div className="flex flex-row mr-auto cursor-pointer">
+              <div className="flex flex-row mr-auto cursor-pointer" onClick={() => exportToCSV(data)}>
                 <Image src="/export.svg" alt="" width={15} height={8.5} />
                 <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Export</div>
               </div>
@@ -139,7 +146,9 @@ export default function Home() {
             <Event key={event.id} event={event} />
           ))}
           <div className="w-full h-12 bg-neutral-100 rounded-bl-xl rounded-br-xl">
-            <button className="btn btn-neutral w-full bg-neutral-100">Load more</button>
+            <button className="btn btn-neutral w-full bg-neutral-100" onClick={() => {
+              setSize(size + 1).catch(() => { console.log("Something went wrong") });
+            }}>Load more</button>
           </div>
         </div>
       </main>
