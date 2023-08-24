@@ -1,1 +1,1 @@
-Hosted at instalog-mezojm10.vercel.app
+Hosted at [](https://instalog-mezojm10.vercel.app)
