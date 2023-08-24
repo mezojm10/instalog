@@ -17,6 +17,7 @@ export async function createEvent(req: NextApiRequest, res: NextApiResponse) {
       data: {
         actorId: result.data.actorId,
         actorName: result.data.actorName,
+        actorEmail: result.data.actorEmail,
         group: result.data.group,
         targetId: result.data.targetId,
         targetName: result.data.targetName,
@@ -37,6 +38,7 @@ export async function createEvent(req: NextApiRequest, res: NextApiResponse) {
       data: {
         actorId: result.data.actorId,
         actorName: result.data.actorName,
+        actorEmail: result.data.actorEmail,
         group: result.data.group,
         targetId: result.data.targetId,
         targetName: result.data.targetName,

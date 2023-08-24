@@ -10,6 +10,7 @@ const jsonSchema: z.ZodType<Json> = z.lazy(() =>
 export const eventInputSchema = z.object({
   actorId: z.string(),
   actorName: z.string(),
+  actorEmail: z.string().email(),
   group: z.string(),
   targetId: z.string(),
   targetName: z.string(),
@@ -20,9 +21,11 @@ export const eventInputSchema = z.object({
 });
 
 export const eventQuerySchema = z.object({
-  startAfter: z.string().nullable().default(null),
-  actorId: z.string().nullable().default(null),
-  targetId: z.string().nullable().default(null),
-  actionId: z.string().nullable().default(null),
-  actionName: z.string().nullable().default(null),
+  startAt: z.string().optional(),
+  actorId: z.string().optional(),
+  actorEmail: z.string().email().optional(),
+  targetId: z.string().optional(),
+  actionId: z.string().optional(),
+  actionName: z.string().optional(),
+  search: z.string().optional(),
 }).default({});

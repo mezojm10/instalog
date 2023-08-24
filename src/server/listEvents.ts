@@ -21,19 +21,66 @@ export async function queryEvents(req: NextApiRequest, res: NextApiResponse) {
     orderBy: {
       createdAt: "desc"
     },
+    where: {
+      actorId: {
+        equals: reqQuery.data.actorId,
+      },
+      actorName: {
+        search: reqQuery.data.search,
+      },
+      actorEmail: reqQuery.data.search ? {
+        search: reqQuery.data.search
+      } : {
+        equals: reqQuery.data.actorEmail,
+      },
+      targetId: {
+        equals: reqQuery.data.targetId,
+      },
+      actionId: {
+        equals: reqQuery.data.actionId,
+      },
+      action: {
+        name: reqQuery.data.search ? {
+          contains: reqQuery.data.search,
+        } : {
+          equals: reqQuery.data.actionName,
+        }
+      },
+    }
+  };
+
+  // Search
+  if (reqQuery.data.search) query.where = {
+    actorId: {
+      equals: reqQuery.data.actorId,
+    },
+    targetId: {
+      equals: reqQuery.data.targetId,
+    },
+    actionId: {
+      equals: reqQuery.data.actionId,
+    },
+    OR: [
+      {
+        actorName: {
+          search: reqQuery.data.search,
+        },
+        actorEmail: {
+          search: reqQuery.data.search,
+        },
+      },
+      {
+        action: {
+          name: {
+            contains: reqQuery.data.search
+          }
+        }
+      }
+    ],
   };
 
   // Pagination
-  if (reqQuery.data.startAfter) query.cursor = { id: reqQuery.data.startAfter };
-
-  // actorId filter
-  if (reqQuery.data.actorId) query.where = { ...query.where, actorId: { equals: reqQuery.data.actorId } };
-  // targetId filter
-  if (reqQuery.data.targetId) query.where = { ...query.where, targetId: { equals: reqQuery.data.targetId } };
-  // actionId filter
-  if (reqQuery.data.actionId) query.where = { ...query.where, actionId: { equals: reqQuery.data.actionId } };
-  // actionName filter
-  if (reqQuery.data.actionName) query.where = { ...query.where, action: { name: { equals: reqQuery.data.actionName } } };
+  if (reqQuery.data.startAt) query.cursor = { id: reqQuery.data.startAt };
 
   const events = await prisma.event.findMany(query);
   res.status(200).json({
