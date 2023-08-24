@@ -1,7 +1,88 @@
 import Head from "next/head";
-import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
+
+import { useEvents } from "~/useEvents";
+
+import type { Event as IEvent } from "~/server/zod";
+
+function formatDate(date: Date) {
+  return `${date.toLocaleDateString("en-Gb", { month: "short" })} ${date.getDate()}, ${date.toLocaleTimeString([], { timeStyle: "short" })}`;
+}
+
+function Event({ event }: { event: IEvent }) {
+  console.log(event);
+  return (
+    <div className="collapse collapse-arrow">
+      <input type="radio" name="my-accordion-2" />
+      <div className="flex flex-row w-full h-16 bg-neutral-50 align-middle justify-between collapse-title">
+        <div className="flex flex-row w-1/4">
+          <div className="w-8 h-8 mt-1 bg-gradient-to-br from-purple-600 to-rose-600 rounded-full">
+            <div className="mx-3 my-2 text-white text-xs font-bold uppercase">{event.actorName.at(0)}</div>
+          </div>
+          <div className="mx-3 my-2 text-zinc-900 text-sm font-normal">
+            {event.actorEmail}
+          </div>
+        </div>
+        <div className="my-2 w-1/4 text-zinc-900 text-sm font-normal">
+          {event.action.name}
+        </div>
+        <div className="my-2 w-1/4 text-zinc-900 text-sm font-normal">
+          {formatDate(event.createdAt)}
+        </div>
+      </div>
+      <div className="collapse-content">
+        <div className="w-full h-72 flex flex-col">
+          <div className="w-full flex flex-row justify-between">
+            <div className="flex flex-col w-1/3">
+              <p className="text-neutral-400 text-sm font-medium uppercase">Actor</p>
+              <div className="flex flex-row justify-between mt-4">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Name</p>
+                <p className="text-black text-sm font-normal">{event.actorName}</p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Email</p>
+                <p className="text-black text-sm font-normal">{event.actorEmail}</p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Name</p>
+                <p className="text-black text-sm font-normal">{event.actorId}</p>
+              </div>
+            </div>
+            <div className="flex flex-col w-1/3 ml-4">
+              <p className="text-neutral-400 text-sm font-medium uppercase">Action</p>
+              <div className="flex flex-row justify-between mt-4">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Name</p>
+                <p className="text-black text-sm font-normal">{event.action.name}</p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Object</p>
+                <p className="text-black text-sm font-normal">event_action</p>
+              </div>
+              <div className="flex flex-row justify-between">
+                <p className="text-neutral-400 text-sm font-medium uppercase">ID</p>
+                <p className="text-black text-sm font-normal">{event.action.id}</p>
+              </div>
+            </div>
+            <div className="flex flex-col w-1/3 ml-4">
+              <p className="text-neutral-400 text-sm font-medium uppercase">Date</p>
+              <div className="flex flex-row justify-between mt-4">
+                <p className="text-neutral-400 text-sm font-medium uppercase">Readable</p>
+                <p className="text-black text-sm font-normal">{formatDate(event.createdAt)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div >
+  )
+}
 
 export default function Home() {
+  const [isLive, setIsLive] = useState(false);
+  const { data = [], isError, isLoading } = useEvents({ isLive });
+  if (isLoading) return <div className="w-50 h-px origin-center rotate-90 border border-neutral-200"></div>;
+  if (isError) return <div>Something went wrong</div>
   return (
     <>
       <Head>
@@ -9,34 +90,35 @@ export default function Home() {
         <meta name="description" content="Instant logging for your activities" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
+      <main className="flex min-h-screen flex-col items-center justify-center bg-white">
+        <div className="w-9/12 h-96 bg-white rounded-2xl shadow border border-zinc-100">
+          <div className="flex flex-col w-full h-20 top-left bg-neutral-100">
+            <div className="flex flex-row h-11 rounded-lg border border-neutral-200 divide-x divide-solid divide-neutral-200">
+              <input className="input input-ghost w-3/4" type="text" placeholder="Search name, email or action..." />
+              <div className="flex flex-row mr-auto cursor-pointer">
+                <Image src="/filter.svg" alt="" width={15} height={8.5} />
+                <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Filter</div>
               </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
+              <div className="flex flex-row mr-auto cursor-pointer">
+                <Image src="/export.svg" alt="" width={15} height={8.5} />
+                <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Export</div>
               </div>
-            </Link>
+              <div className="flex flex-row mr-auto cursor-pointer" onClick={() => setIsLive(!isLive)}>
+                <Image src="/live.svg" alt="" width={15} height={8.5} />
+                <div className="ml-2 mt-3 text-zinc-600 text-xs font-normal uppercase">Live</div>
+              </div>
+            </div>
+            <div className="flex flex-row w-full justify-evenly mt-2">
+              <div className="w-1/3 h-4 ml-24 text-zinc-600 text-sm font-semibold uppercase">Actor</div>
+              <div className="w-1/3 h-4 text-zinc-600 text-sm font-semibold uppercase">Action</div>
+              <div className="w-1/3 h-4 pl-32 text-zinc-600 text-sm font-semibold uppercase">Date</div>
+            </div>
+          </div>
+          {data.map(event => (
+            <Event key={event.id} event={event} />
+          ))}
+          <div className="w-full h-12 bg-neutral-100 rounded-bl-xl rounded-br-xl">
+            <button className="btn btn-neutral w-full bg-neutral-100">Load more</button>
           </div>
         </div>
       </main>
